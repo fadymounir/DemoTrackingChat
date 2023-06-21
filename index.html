@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2>Firebase Web Push Notification Example</h2>
+
+<h2>Your Device Token Is : </h2>
+<p id="token"></p>
+<script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-messaging.js"></script>
+<script>
+    var firebaseConfig = {
+        apiKey: "AIzaSyA1dgB_c3CZQ6qcg5iBk73iAxkEGp-9-bE",
+        authDomain: "fir-37bc1.firebaseapp.com",
+        projectId: "fir-37bc1",
+        storageBucket: "fir-37bc1.appspot.com",
+        messagingSenderId: "87442233793",
+        appId: "1:87442233793:web:caf536e0ebaad0ecce7740",
+        measurementId: "G-0VMV8K1CJC"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const messaging = firebase.messaging();
+
+    function IntitalizeFireBaseMessaging() {
+        messaging
+            .requestPermission()
+            .then(function () {
+                console.log("Notification Permission");
+                return messaging.getToken();
+            })
+            .then(function (token) {
+                console.log("Token : " + token);
+                document.getElementById("token").innerHTML = token;
+            })
+            .catch(function (reason) {
+                console.log(reason);
+            });
+    }
+
+    messaging.onMessage(function (payload) {
+        console.log(payload);
+        const notificationOption = {
+            body: payload.notification.body,
+            icon: payload.notification.icon
+        };
+
+        if (Notification.permission === "granted") {
+            var notification = new Notification(payload.notification.title, notificationOption);
+
+            notification.onclick = function (ev) {
+                ev.preventDefault();
+                window.open(payload.notification.click_action, '_blank');
+                notification.close();
+            }
+        }
+
+    });
+    messaging.onTokenRefresh(function () {
+        messaging.getToken()
+            .then(function (newtoken) {
+                console.log("New Token : " + newtoken);
+            })
+            .catch(function (reason) {
+                console.log(reason);
+            })
+    })
+    IntitalizeFireBaseMessaging();
+</script>
+</body>
+</html>
